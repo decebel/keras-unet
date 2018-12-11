@@ -24,7 +24,12 @@ You can also <b>drag and drop</b> an image file to process it<BR>
 var unet = null;
 const imw = 224;
 const imh = 224;
-const images = [];
+const images = `00010.jpg
+00011.jpg
+00012.jpg
+00013.jpg
+00014.jpg
+laurent_denoue.jpg`.split('\n');
 async function loadUNet() {
 	console.log('loading model...');
   const unet = await tf.loadModel('model.json');
@@ -116,7 +121,7 @@ function drawResult(l) {
 		{
 			var pixel = l[idx];
 			var val = 0;
-			if (pixel === 1)
+			if (pixel >= 0.8)
 				val = 255;
 			data[idx4] += val;
 			data[idx4+1] += val;
@@ -132,10 +137,10 @@ function drawResult(l) {
 var result = null;
 async function init() {
 	imagecontainer.textContent = 'loading model...';
-  //await setupWebcam();
+  await setupWebcam();
   //await setupVideo();
   unet = await loadUNet();
-
+  imagecontainer.textContent = 'loaded!';
 	//print(unet.summary());
   // Warm up the model. This uploads weights to the GPU and compiles the WebGL
   // programs so the first time we collect data from the webcam it will be
@@ -143,7 +148,7 @@ async function init() {
   tf.tidy(() => {
   });
   
-  imagecontainer.innerHTML = '';
+  //imagecontainer.innerHTML = '';
   for (var i=0;i<images.length;i++)
   {
   	var img = document.createElement('img');
@@ -163,18 +168,18 @@ var processing = false;
 function processWebCam() {
 	if (!processing)
 		return;
-	var videow = webcamElement.videoWidth;
-	var videoh = webcamElement.videoHeight
-	canvasElement.getContext('2d').drawImage(webcamElement,80,0,videow-160,videoh,0,0,imw,imh);
+	var w = webcamElement.videoWidth;
+	var h = webcamElement.videoHeight
+	canvasElement.getContext('2d').drawImage(webcamElement,0,0,w,h,0,0,imw,imh);
 	var tfImage = tf.fromPixels(canvasElement);
-	tfImage = tfImage.slice([0, 0, 0], [imh, imw, 1]);
+	tfImage = tfImage.slice([0, 0, 0], [imh, imw, 3]);
 	var batchedImage = tfImage.expandDims(0);
-	batchedImage = batchedImage.toFloat().div(tf.scalar(127)).sub(tf.scalar(1));
+	batchedImage = batchedImage.toFloat().div(tf.scalar(255));
 	//console.time('predict');
 	result = unet.predict(batchedImage);
 	//console.timeEnd('predict');
-	result = result.argMax(axis=2);
-	result = result.reshape([imh,imw]);
+	//result = result.argMax(axis=2);
+	//result = result.reshape([imh,imw]);
 	//console.log(result.shape);
 	//result.reshape
 	result.data().then(l => drawResult(l));
@@ -194,7 +199,7 @@ function processImage(image) {
 	//console.time('predict');
 	result = unet.predict(batchedImage);
 	//console.timeEnd('predict');
-	result = result.argMax(axis=2);
+	//result = result.argMax(axis=2);
 	//result = result.reshape([imh,imw]);
 	result.data().then(l => drawResult(l));
 }

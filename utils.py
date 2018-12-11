@@ -11,7 +11,6 @@ from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, EarlyStopping
 from keras import backend as K
 from keras.utils import plot_model
 import tensorflow as tf
-from IPython.display import clear_output
 
 
 def mean_iou(y_true, y_pred):
@@ -179,19 +178,3 @@ class PlotLearning(keras.callbacks.Callback, fingernailseg):
         self.val_acc.append(logs.get('val_mean_iou'))
         self.i += 1
         print('i=',self.i,'loss=',logs.get('loss'),'val_loss=',logs.get('val_loss'),'mean_iou=',logs.get('mean_iou'),'val_mean_iou=',logs.get('val_mean_iou'))
-#         fig, ax1 = plt.subplots(figsize=(10,5));
-#         clear_output(wait=True)
-#         lns1 = ax1.plot(self.x, self.acc, label="Mean IoU", color='blue', linewidth = 3.);
-#         lns2 = ax1.plot(self.x, self.val_acc, label="Mean validation IoU", color='green', linewidth = 3.);
-#         ax1.set_ylabel('IoU',fontsize=15);
-#         ax1.set_xlabel('Epoch',fontsize=15);
-#         ax1.set_title('Fingernails U-Net Segmentation Model');
-#         ax2 = ax1.twinx()
-#         lns3 = ax2.plot(self.x, self.losses, '--', label="loss", color='orange');
-#         lns4 = ax2.plot(self.x, self.val_losses, '--', label="validation loss", color='red');
-#         ax2.set_ylabel('Loss',fontsize=15)
-#         lns = lns1+lns2+lns3+lns4
-#         ax1.legend(lns, [l.get_label() for l in lns])
-#         ax1.grid(True)
-#         plt.xlim([-0.05, self.epochs+.05])
-#         plt.show();

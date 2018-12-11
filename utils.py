@@ -136,6 +136,8 @@ class fingernailseg:
             
     def load_model(self):
         self.model.load_weights('unet.h5')
+        self.model.save('unet.json')
+        print('model loaded and unet.json saved')
 
     def predict(self):
         return self.model.predict(self.X_test, batch_size=self.batch_size, verbose=0)
